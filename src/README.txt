@@ -1,10 +1,14 @@
 This directory contains all source code files required for compiling the
 commands for GF2 Function Generator. A list of relevant files follows:
+– common.c;
+– common.h;
 – gf2-amp.c;
 – gf2-amp50.c;
 – gf2-clear.c;
 – gf2-clkoff.c;
 – gf2-clkon.c;
+– gf2-core.c;
+– gf2-core.h;
 – gf2-dacoff.c;
 – gf2-dacon.c;
 – gf2-freq.c;

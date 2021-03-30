@@ -1,5 +1,5 @@
 # Makefile for all GF2 commands, Debian Linux (GCC)
-# Copyright (c) 2018 Samuel Lourenço
+# Copyright (c) 2018-2019 Samuel Lourenço
 
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -22,14 +22,14 @@ CC = gcc
 CFLAGS = -O2 -std=gnu99 -Wall -pedantic
 LDFLAGS = -s
 LDLIBS = -lm -lusb-1.0
-OBJECTS = libusb-extra
+OBJECTS = common.o gf2-core.o libusb-extra.o
 TARGETS = gf2-amp gf2-amp50 gf2-clear gf2-clkoff gf2-clkon gf2-dacoff gf2-dacon gf2-freq gf2-freq0 gf2-freq1 gf2-list gf2-lockotp gf2-phase gf2-phase0 gf2-phase1 gf2-reset gf2-selfreq0 gf2-selfreq1 gf2-selphase0 gf2-selphase1 gf2-sine gf2-start gf2-status gf2-stop gf2-tri
 
 .PHONY: all clean install uninstall
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.o $(OBJECTS).o
+$(TARGETS): % : %.o $(OBJECTS)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 %.o: %.c

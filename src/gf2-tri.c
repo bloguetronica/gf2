@@ -1,5 +1,5 @@
-/* GF2 Tri Command - Version 1.0 for Debian Linux
-   Copyright (c) 2018 Samuel Lourenço
+/* GF2 Tri Command - Version 1.1 for Debian Linux
+   Copyright (c) 2018-2019 Samuel Lourenço
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the Free
@@ -24,28 +24,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <libusb-1.0/libusb.h>
+#include "gf2-core.h"
 #include "libusb-extra.h"
-
-// Defines
-#define TR_TIMEOUT 500  // Transfer timeout in milliseconds
-
-// Function prototypes
-void configure_spi_mode(libusb_device_handle *devhandle, unsigned char channel, bool cpol, bool cpha);
-void disable_cs(libusb_device_handle *devhandle, unsigned char channel);
-void disable_spi_delays(libusb_device_handle *devhandle, unsigned char channel);
-void select_cs(libusb_device_handle *devhandle, unsigned char channel);
-void set_gpio2(libusb_device_handle *devhandle, bool value);
-void set_gpio3(libusb_device_handle *devhandle, bool value);
-void set_triangle_wave(libusb_device_handle *devhandle);
-
-// Global variables
-int err_level = EXIT_SUCCESS;  // This variable is manipulated by other functions besides main()!
 
 int main(int argc, char **argv)
 {
+    err_level = EXIT_SUCCESS;  // Note that this variable is declared externally!
     libusb_context *context;
-    libusb_device_handle *devhandle;
-    bool kernel_attached = false;
     if (libusb_init(&context) != 0)  // Initialize libusb. In case of failure
     {
         fprintf(stderr, "Error: Could not initialize libusb.\n");
@@ -53,6 +38,7 @@ int main(int argc, char **argv)
     }
     else  // If libusb is initialized
     {
+        libusb_device_handle *devhandle;
         if (argc < 2)  // If the program was called without arguments
             devhandle = libusb_open_device_with_vid_pid(context, 0x10C4, 0x8BF1);  // Open a device and get the device handle
         else  // Serial number was specified as argument
@@ -64,6 +50,7 @@ int main(int argc, char **argv)
         }
         else  // If the device is successfully opened and a handle obtained
         {
+            bool kernel_attached = false;
             if (libusb_kernel_driver_active(devhandle, 0) != 0)  // If a kernel driver is active on the interface
             {
                 libusb_detach_kernel_driver(devhandle, 0);  // Detach the kernel driver
@@ -76,7 +63,7 @@ int main(int argc, char **argv)
             }
             else  // If the interface is successfully claimed
             {
-                configure_spi_mode(devhandle, 0, true, false);  // Clock polarity regarding channel 0 is active low (CPOL = 1) and data is valid on each falling edge (CPHA = 0)
+                configure_spi_mode(devhandle, 0, CPOL1, CPHA0);  // Clock polarity regarding channel 0 is active low (CPOL = 1) and data is valid on each falling edge (CPHA = 0)
                 disable_spi_delays(devhandle, 0);  // Disable all SPI delays for channel 0
                 select_cs(devhandle, 0);  // Enable the chip select corresponding to channel 0, and disable any others
                 set_triangle_wave(devhandle);  // Set the waveform to triangular (by sending a specific sequence of bytes to the AD9834 waveform generator on channel 0)
@@ -93,102 +80,4 @@ int main(int argc, char **argv)
         libusb_exit(context);  // Deinitialize libusb
     }
     return err_level;
-}
-
-void configure_spi_mode(libusb_device_handle *devhandle, unsigned char channel, bool cpol, bool cpha)  // Configures the given SPI channel in respect to its clock polarity and phase
-{
-    unsigned char control_buf_out[2] = {
-        channel,                          // Selected channel
-        0x20 * cpha + 0x10 * cpol + 0x08  // Control word (specified polarity and phase, push-pull mode, 12MHz)
-    };
-    if (libusb_control_transfer(devhandle, 0x40, 0x31, 0x0000, 0x0000, control_buf_out, sizeof(control_buf_out), TR_TIMEOUT) != sizeof(control_buf_out))
-    {
-        fprintf(stderr, "Error: Failed control transfer (0x40, 0x31).\n");
-        err_level = EXIT_FAILURE;
-    }
-}
-
-void disable_cs(libusb_device_handle *devhandle, unsigned char channel)  // Disables the chip select corresponding to the target channel
-{
-    unsigned char control_buf_out[2] = {
-        channel,  // Selected channel
-        0x00      // Corresponding chip select disabled
-    };
-    if (libusb_control_transfer(devhandle, 0x40, 0x25, 0x0000, 0x0000, control_buf_out, sizeof(control_buf_out), TR_TIMEOUT) != sizeof(control_buf_out))
-    {
-        fprintf(stderr, "Error: Failed control transfer (0x40, 0x25).\n");
-        err_level = EXIT_FAILURE;
-    }
-}
-
-void disable_spi_delays(libusb_device_handle *devhandle, unsigned char channel)  // Disables all SPI delays for a given channel
-{
-    unsigned char control_buf_out[8] = {
-        channel,     // Selected channel
-        0x00,        // All SPI delays disabled, no CS toggle
-        0x00, 0x00,  // Inter-byte,
-        0x00, 0x00,  // post-assert and
-        0x00, 0x00   // pre-deassert delays all set to 0us
-    };
-    if (libusb_control_transfer(devhandle, 0x40, 0x33, 0x0000, 0x0000, control_buf_out, sizeof(control_buf_out), TR_TIMEOUT) != sizeof(control_buf_out))
-    {
-        fprintf(stderr, "Error: Failed control transfer (0x40, 0x33).\n");
-        err_level = EXIT_FAILURE;
-    }
-}
-
-void select_cs(libusb_device_handle *devhandle, unsigned char channel)  // Enables the chip select of the target channel, disabling any others
-{
-    unsigned char control_buf_out[2] = {
-        channel,  // Selected channel
-        0x02      // Only the corresponding chip select is enabled, all the others are disabled
-    };
-    if (libusb_control_transfer(devhandle, 0x40, 0x25, 0x0000, 0x0000, control_buf_out, sizeof(control_buf_out), TR_TIMEOUT) != sizeof(control_buf_out))
-    {
-        fprintf(stderr, "Error: Failed control transfer (0x40, 0x25).\n");
-        err_level = EXIT_FAILURE;
-    }
-}
-
-void set_gpio2(libusb_device_handle *devhandle, bool value)  // Sets the GPIO.2 pin on the CP2130 to a given value
-{
-    unsigned char control_buf_out[4] = {
-        0x00, 0xFF * value,  // Set the value of GPIO.2 to the intended value
-        0x00, 0x20           // Set the mask so that only GPIO.2 is changed
-    };
-    if (libusb_control_transfer(devhandle, 0x40, 0x21, 0x0000, 0x0000, control_buf_out, sizeof(control_buf_out), TR_TIMEOUT) != sizeof(control_buf_out))
-    {
-        fprintf(stderr, "Error: Failed control transfer (0x40, 0x21).\n");
-        err_level = EXIT_FAILURE;
-    }
-}
-
-void set_gpio3(libusb_device_handle *devhandle, bool value)  // Sets the GPIO.3 pin on the CP2130 to a given value
-{
-    unsigned char control_buf_out[4] = {
-        0x00, 0xFF * value,  // Set the value of GPIO.3 to the intended value
-        0x00, 0x40           // Set the mask so that only GPIO.3 is changed
-    };
-    if (libusb_control_transfer(devhandle, 0x40, 0x21, 0x0000, 0x0000, control_buf_out, sizeof(control_buf_out), TR_TIMEOUT) != sizeof(control_buf_out))
-    {
-        fprintf(stderr, "Error: Failed control transfer (0x40, 0x21).\n");
-        err_level = EXIT_FAILURE;
-    }
-}
-
-void set_triangle_wave(libusb_device_handle *devhandle)  // Configures the control register on the AD9834 waveform generator in order to generate a triangle wave (channel 0 must be enabled)
-{
-    unsigned char write_command_buf[10] = {
-        0x00, 0x00,              // Reserved
-        0x01,                    // Write command
-        0x00,                    // Reserved
-        0x02, 0x00, 0x00, 0x00,  // Two bytes to write
-        0x22, 0x02               // Triangular waveform, B28 = 1, PIN/SW = 1
-    };
-    int bytes_written;
-    if (libusb_bulk_transfer(devhandle, 0x01, write_command_buf, sizeof(write_command_buf), &bytes_written, TR_TIMEOUT) != 0)
-    {
-        fprintf(stderr, "Error: Failed bulk OUT transfer to endpoint 1 (address 0x01).\n");
-        err_level = EXIT_FAILURE;
-    }
 }
