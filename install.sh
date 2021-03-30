@@ -6,11 +6,15 @@ apt-get -qq install build-essential
 apt-get -qq install libusb-1.0-0-dev
 echo Copying source code files...
 mkdir -p /usr/local/src/gf2
+cp -f src/common.c /usr/local/src/gf2/.
+cp -f src/common.h /usr/local/src/gf2/.
 cp -f src/gf2-amp.c /usr/local/src/gf2/.
 cp -f src/gf2-amp50.c /usr/local/src/gf2/.
 cp -f src/gf2-clear.c /usr/local/src/gf2/.
 cp -f src/gf2-clkoff.c /usr/local/src/gf2/.
 cp -f src/gf2-clkon.c /usr/local/src/gf2/.
+cp -f src/gf2-core.c /usr/local/src/gf2/.
+cp -f src/gf2-core.h /usr/local/src/gf2/.
 cp -f src/gf2-dacoff.c /usr/local/src/gf2/.
 cp -f src/gf2-dacon.c /usr/local/src/gf2/.
 cp -f src/gf2-freq.c /usr/local/src/gf2/.

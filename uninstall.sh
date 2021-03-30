@@ -16,10 +16,10 @@ rm -f /usr/local/share/man/man1/gf2-freq0.1.gz
 rm -f /usr/local/share/man/man1/gf2-freq1.1.gz
 rm -f /usr/local/share/man/man1/gf2-list.1.gz
 rm -f /usr/local/share/man/man1/gf2-lockotp.1.gz
-rm -f /usr/local/share/man/man1/gf2-reset.1.gz
 rm -f /usr/local/share/man/man1/gf2-phase.1.gz
 rm -f /usr/local/share/man/man1/gf2-phase0.1.gz
 rm -f /usr/local/share/man/man1/gf2-phase1.1.gz
+rm -f /usr/local/share/man/man1/gf2-reset.1.gz
 rm -f /usr/local/share/man/man1/gf2-selfreq0.1.gz
 rm -f /usr/local/share/man/man1/gf2-selfreq1.1.gz
 rm -f /usr/local/share/man/man1/gf2-selphase0.1.gz
