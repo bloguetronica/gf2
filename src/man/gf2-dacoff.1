@@ -1,0 +1,30 @@
+.TH GF2-DACOFF 1
+.SH NAME
+gf2-dacoff \- disable GF2 Function Generator waveform generator DAC
+.SH SYNOPSIS
+.B gf2-dacoff
+.RI [ SERIALNUMBER ]
+.SH DESCRIPTION
+.B gf2-dacoff
+disables the internal waveform generator DAC. Consequently, both analog and
+digital outputs of the function generator will be inactive after invoking this
+command. It is not guaranteed, though, that the digital output will idle low
+(unless you invoke
+.B gf2-clkoff
+too). To re-enable the waveform generator DAC, invoke
+.BR gf2-dacon .
+You can verify the waveform generator DAC status by calling
+.BR gf2-status .
+
+Specifying a serial number is optional.
+.SH "EXIT STATUS"
+Exits with a status of zero in case of success. Returns one should an error
+occur.
+.SH AUTHOR
+Samuel Lourenço (samuel.fmlourenco@gmail.com).
+.SH "SEE ALSO"
+gf2-amp(1), gf2-amp50(1), gf2-clear(1), gf2-clkoff(1), gf2-clkon(1),
+gf2-dacon(1), gf2-freq(1), gf2-freq0(1), gf2-freq1(1), gf2-list(1),
+gf2-lockotp(1), gf2-phase(1), gf2-phase0(1), gf2-phase1(1), gf2-reset(1),
+gf2-selfreq0(1), gf2-selfreq1(1), gf2-selphase0(1), gf2-selphase1(1),
+gf2-sine(1), gf2-start(1), gf2-status(1), gf2-stop(1), gf2-tri(1)
