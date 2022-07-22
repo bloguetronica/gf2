@@ -50,7 +50,7 @@ int main(int argc, char **argv)
                 err = device.open();  // Open a device and get the device handle
             } else {  // Serial number was specified as a second (optional) argument
                 err = device.open(argv[2]);  // Open the device having the specified serial number, and get the device handle
-            }    
+            }
             if (err == GF2Device::SUCCESS) {  // Device was successfully opened
                 int errcnt = 0;
                 std::string errstr;
