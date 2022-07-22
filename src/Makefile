@@ -24,8 +24,8 @@ CXX = g++
 CXXFLAGS = -O2 -std=c++11 -Wall -pedantic
 LDFLAGS = -s
 LDLIBS = -lusb-1.0
-OBJECTS = cp2130.o error.o gf2device.o libusb-extra.o
-TARGETS = gf2-clear gf2-info gf2-list gf2-lockotp gf2-reset gf2-selfreq0 gf2-selfreq1 gf2-selphase0 gf2-selphase1 gf2-start gf2-status gf2-stop
+OBJECTS = cp2130.o error.o gf2device.o libusb-extra.o utils.o
+TARGETS = gf2-amp gf2-amp50 gf2-clear gf2-info gf2-list gf2-lockotp gf2-reset gf2-selfreq0 gf2-selfreq1 gf2-selphase0 gf2-selphase1 gf2-start gf2-status gf2-stop
 
 .PHONY: all clean install uninstall
 
