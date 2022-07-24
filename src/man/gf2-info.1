@@ -1,14 +1,16 @@
-.TH GF2-LIST 1
+.TH GF2-INFO 1
 .SH NAME
-gf2-list \- list connected GF2 Function Generator devices
+gf2-info \- show information about GF2 Function Generator
 .SH SYNOPSIS
-.B gf2-list
+.B gf2-info
+.RI [ SERIALNUMBER ]
 .SH DESCRIPTION
-.B gf2-list
-lists all function generator devices that are currently connected. Note that
-the first device on the list is always the one addressed by default. Hence,
-when applicable, a command invoked without any serial number specified will
-always take effect on that device.
+.B gf2-info
+shows information about the function generator device, namely the manufacturer
+and product names, the serial number, the hardware revision and the maximum
+current consumption.
+
+Specifying a serial number is optional.
 .SH "EXIT STATUS"
 Exits with a status of zero in case of success. Returns one should an error
 occur.
@@ -17,7 +19,7 @@ Samuel Lourenço (samuel.fmlourenco@gmail.com).
 .SH "SEE ALSO"
 gf2-amp(1), gf2-amp50(1), gf2-clear(1), gf2-clkoff(1), gf2-clkon(1),
 gf2-dacoff(1), gf2-dacon(1), gf2-freq(1), gf2-freq0(1), gf2-freq1(1),
-gf2-info(1), gf2-lockotp(1), gf2-phase(1), gf2-phase0(1), gf2-phase1(1),
+gf2-list(1), gf2-lockotp(1), gf2-phase(1), gf2-phase0(1), gf2-phase1(1),
 gf2-reset(1), gf2-selfreq0(1), gf2-selfreq1(1), gf2-selphase0(1),
 gf2-selphase1(1), gf2-sine(1), gf2-start(1), gf2-status(1), gf2-stop(1),
 gf2-tri(1)
